@@ -1,6 +1,8 @@
 # API call
 
-This call will query the fvCEp Class to retrieve {{endpoint-ip-address}} details.
+This call will query the fvCEp Class to retrieve the {{endpoint-ip-address}} details.
+
+Output can be restricted by removing the subtree-class queries.
 
 `https://{{apic}}/api/node/class/fvCEp.json?query-target-filter=and(eq(fvCEp.ip,"{{endpoint-ip-address}}"))&rsp-subtree=children&rsp-subtree-class=fvRsToVm&rsp-subtree-class=fvRsVm&rsp-subtree-class=fvRsHyper&rsp-subtree-class=fvRsCEpToPathEp&rsp-subtree-class=fvIp&rsp-subtree-class=fvPrimaryEncap&order-by=fvCEp.ip`
 
