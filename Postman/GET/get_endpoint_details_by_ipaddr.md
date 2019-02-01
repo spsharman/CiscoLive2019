@@ -1,4 +1,4 @@
-# API call
+# API query to Class fvCEp
 
 This call will query the fvCEp Class to retrieve the {{endpoint-ip-address}} details.
 
