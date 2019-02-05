@@ -1,0 +1,61 @@
+---
+# Simple playbook to map the EPGs to BDs inside either a given Tenant or all Tenants
+
+#Play 1
+- name:                                   Setup playbook
+  hosts:                                  localhost
+  connection:                             local
+  gather_facts:                           no
+
+  vars_prompt:
+    - name:                               "tenant"
+      prompt:                             "Get EPG and Bridge Domain mapping for a given Tenant (press enter for all Tenants)"
+      private:                            no
+
+  tasks:
+    - name:
+      set_fact:
+        tenant:                           "{{ tenant }}"
+        debug:                            true
+
+
+# Play 2
+- name:                                   Get EPG and Bridge Domain mapping for a given Tenant
+  hosts:                                  localhost
+  connection:                             local
+  gather_facts:                           no
+
+  tasks:
+    - name:                               Get EPG and Bridge Domain mapping for a given Tenant
+      aci_rest:
+        host:                             "{{ apic }}"
+        username:                         "{{ apic_username }}"
+        password:                         "{{ apic_password }}"
+        validate_certs:                   no
+        use_proxy:                        no
+        method:                           get
+        path:                             /api/node/class/fvAp.json?target-subtree-class=fvRsBd&query-target-filter=and(wcard(fvAEPg.dn,"tn-{{ tenant }}"))&rsp-subtree=full&rsp-subtree-class=fvRsBd
+      register:                           all_epgs_to_bridge_domains
+
+    - name:                               Create list of Bridge Domains
+      set_fact:
+        all_epgs_to_bridge_domains_names: "{{ all_epgs_to_bridge_domains |json_query('imdata[*].fvAEPg.attributes.dn') | sort }}"
+
+    - debug:
+        msg:                              "{{ all_epgs_to_bridge_domains_names }}"
+
+
+# Debug
+- name:                                   Print debug information
+  hosts:                                  localhost
+  connection:                             local
+  gather_facts:                           no
+
+  tasks:
+    - debug:
+        var:                              all_epgs_to_bridge_domains
+      when:                               debug == true
+
+    - debug:
+        msg:                              all_epgs_to_bridge_domains_names
+      when:                               debug == true
