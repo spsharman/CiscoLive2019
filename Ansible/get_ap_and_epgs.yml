@@ -1,10 +1,8 @@
-This playbook will prompt the user to input a Tenant, it will then print all Application Profiles and EPGs for the given Tenant.
-
-Toggle **debug:** true/false to display debug information.
-
-
-```yaml
 ---
+# This playbook will prompt the user to input a Tenant, it will then print all Application Profiles and EPGs for the given Tenant.
+#
+#Toggle **debug:** true/false to display debug information.
+
 #Play 1
 - name:                        Setup playbook
   hosts:                       localhost
@@ -131,4 +129,3 @@ Toggle **debug:** true/false to display debug information.
     - debug:
         msg:                   all_epg_names
       when:                    debug == true
-```
