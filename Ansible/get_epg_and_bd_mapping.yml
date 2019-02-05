@@ -1,5 +1,8 @@
 ---
 # Simple playbook to map the EPGs to BDs inside either a given Tenant or all Tenants
+#
+# Toggle **debug:** true/false to display debug information.
+
 
 #Play 1
 - name:                                   Setup playbook
