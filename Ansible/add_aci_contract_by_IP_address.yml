@@ -1,0 +1,311 @@
+---
+# This playbook will prompt the user to enter source/destination IP address, protocol, and port.
+# Contracts will be created between the EPGs where the IP addresses have been located.
+#
+#Toggle **debug:** true/false to display debug information.
+
+
+# Gather required details
+- name:                              Set facts
+  hosts:                             "{{ apic }}"
+  gather_facts:                      no
+
+# Enter variable details
+  vars:
+    scope:                           "context"
+
+  vars_prompt:
+    - name:                          "src_ip_addr"
+      prompt:                        "Enter source IP address"
+      private:                       no
+
+    - name:                          "dst_ip_addr"
+      prompt:                        "Enter destination IP address"
+      private:                       no
+
+    - name:                          "subj_name"
+      prompt:                        "Enter the protocol type (tcp or udp)"
+      private:                       no
+
+    - name:                          "dst_port"
+      prompt:                        "Enter the destination port to be opened"
+      private:                       no
+
+  tasks:
+    # Set facts for use in subsequent playbooks
+    - name:                          Set fact for user entered source IP address
+      set_fact:
+        src_ip_addr:                 "{{ src_ip_addr }}"
+        dst_ip_addr:                 "{{ dst_ip_addr }}"
+        subj_name:                   "{{ subj_name }}"
+        dst_port:                    "{{ dst_port }}"
+        scope:                       "{{ scope }}"
+        flt_name:                    "{{ subj_name }}_src_port_any_to_dst_port_{{ dst_port}}"
+
+# Step 1
+# Take an ACI config snapshot before proceeding
+- name:                              Step 1  Create a snapshot
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    - name:                          Create a Snapshot
+      aci_config_snapshot:
+        host:                        '{{ apic }}'
+        username:                    '{{ apic_username }}'
+        password:                    '{{ apic_password }}'
+        validate_certs:              no
+        state:                       present
+        export_policy:               config_backup
+        max_count:                   10
+        description:                 Snapshot Created by Ansible
+
+# Step 2
+# Get source IP Endpoint details
+- name:                              Step 2  Retrieve Source IP ACI Details
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    # Check source IP is registered on the fabric and discover it's EPG
+    - name:                          Get Tenant, App Profile and EPG for Source IP address
+      aci_rest:
+        host:                        "{{ apic }}"
+        username:                    "{{ apic_username }}"
+        password:                    "{{ apic_password }}"
+        validate_certs:              no
+        use_proxy:                   no
+        method:                      get
+        path:                        /api/node/class/fvCEp.json?query-target-filter=and(eq(fvCEp.ip,"{{ src_ip_addr }}"))
+      register:                      cons_epg
+
+    # Fail playbook if supplied source IP address doesn't exist on the ACI fabric
+    - name:                          End playbook if source IP does not exist
+      fail:
+        msg:                         "Source IP address does not exist on the ACI Fabric"
+      when:                          cons_epg.imdata | length == 0
+
+    # Extract Tenant, App Profile and EPG from returned data
+    - name:                          Extract the DN of the source_epg and save in new var called src_epg_dn
+      set_fact:
+        cons_epg_dn :                 "{{ cons_epg.imdata[0].fvCEp.attributes.dn }}"
+
+    - name:                          Split the cons_epg_dn
+      set_fact:
+        cons_epg_info :               "{{ cons_epg_dn.split('/')}} "
+
+    - name:                          Set source variables
+      set_fact:
+        cons_tn_name :               "{{ cons_epg_info[1] | regex_replace('^tn-','') }}"
+        cons_ap_name :               "{{ cons_epg_info[2] | regex_replace('^ap-','') }}"
+        cons_epg_name :              "{{ cons_epg_info[3] | regex_replace('^epg-','') }}"
+
+    # Comment out this debug section as required
+    - name:                          Source Endpoint ACI Fabric Details
+      debug:
+        msg:
+          - "Consumer Tenant Name:     [{{ cons_tn_name }}]"
+          - "Consumer App Profile Name: [{{ cons_ap_name }}]"
+          - "Consumer EPG Name:        [{{ cons_epg_name }}]"
+
+# Step 3
+# Get destination IP Endpoint details
+- name:                              Step 3  Retrieve Destination IP ACI Details
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    # Check destination IP is registered on the fabric and discover it's EPG
+    - name:                          Get Tenant, App Profile and EPG for Destination IP address
+      aci_rest:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          method:                    get
+          path:                      /api/node/class/fvCEp.json?query-target-filter=and(eq(fvCEp.ip,"{{ dst_ip_addr }}"))
+      register:                      prov_epg
+
+    # Fail playbook if supplied destination IP address doesn't exist on the ACI fabric
+    - name:                          End playbook if destination IP does not exist
+      fail:
+        msg:                         "Destination IP address does not exist on the ACI Fabric"
+      when:                          prov_epg.imdata | length == 0
+
+    # Start extracting the destination EPG information
+    - name:                          Extract the DN of the destination_epg and save in new var called dst_epg_dn
+      set_fact:
+        prov_epg_dn :                 "{{ prov_epg.imdata[0].fvCEp.attributes.dn }}"
+
+    - name:                          Split the prov_epg_dn
+      set_fact:
+        prov_epg_info :               "{{ prov_epg_dn.split('/')}} "
+
+    - name:                          Set destination variables
+      set_fact:
+        prov_tn_name :               "{{ prov_epg_info[1] | regex_replace('^tn-','') }}"
+        prov_ap_name :               "{{ prov_epg_info[2] | regex_replace('^ap-','') }}"
+        prov_epg_name :              "{{ prov_epg_info[3] | regex_replace('^epg-','') }}"
+
+    # Comment out this debug section as required
+    - name:                          Destination Endpoint ACI Fabric Details
+      debug:
+        msg:
+          - "Provider Tenant Name: [{{ prov_tn_name }}]"
+          - "provider App Profile Name: [{{ prov_ap_name }}]"
+          - "Provider EPG Name:   [{{ prov_epg_name }}]"
+
+# Step 4
+# Create the filter
+- name:                              Step 4  Create Filter
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    - name:                          Create Filter
+      aci_filter:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          tenant:                    "common"
+          filter:                    "{{ subj_name }}_src_port_any_to_dst_port_{{ dst_port }}"
+          state:                     "present"
+      register:                      flt
+
+# Step 5
+# Create new tcp filter  entry
+- name:                              Step 5  Create Filter Entry
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    - name:                          Create Filter Entry
+      aci_filter_entry:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          filter:                    "{{ subj_name }}_src_port_any_to_dst_port_{{ dst_port }}"
+          entry:                     "src_port_any_to_dst_port_{{ dst_port }}"
+          tenant:                    "common"
+          ether_type:                "ip"
+          ip_protocol:               "{{ subj_name }}"
+          dst_port:                  "{{ dst_port }}"
+          state:                     "present"
+      register:                      flt_entry
+
+# Step 6
+# Create the contract
+- name:                              Step 6  Create contract
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    # Using the destination IP tenant information here (prov_tn_name)
+    # for the location of the new contract
+    - name:                          Create Contract
+      aci_rest:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          path:                      /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}.json
+          method:                    post
+          content:
+            vzBrCP:
+              attributes:
+                name:                "permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}"
+                scope:               "{{ scope }}"
+                status:              "created,modified"
+
+    - name:                          Define the contract tenant name
+      set_fact:
+        cont_name:                   "permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}"
+      register:                      cont_name
+
+# Step 7
+# Add the subject and filter
+- name:                              Step 7  Add the Subject and Filter
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    - name:                          Add the subject and filter
+      aci_rest:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          path:                      /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}/subj-{{ subj_name }}.json
+          method:                    post
+          content:
+            vzSubj:
+              attributes:
+                name:                "{{ subj_name }}"
+                status:              "created,modified"
+              children:
+                -
+                 vzRsSubjFiltAtt:
+                   attributes:
+                     tnVzFilterName: "{{ flt_name }}"
+                     status:         "created,modified"
+      register:                      subj_and_flt
+
+# Step 8
+# Bind the contract to the source EPG
+- name:                              Step 8  Bind Contract to Provider EPG
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    - name:                          Bind Contract to Provider EPG
+      aci_epg_to_contract:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          tenant:                    "{{ prov_tn_name }}"
+          ap:                        "{{ prov_ap_name }}"
+          epg:                       "{{ prov_epg_name }}"
+          contract:                  "{{ cont_name }}"
+          contract_type:             provider
+          state:                     present
+      register:                      prov_epg_contract
+
+# Step 9
+# Bind the contract to the destination EPG
+- name:                              Step 9  Bind Contract to Consumer EPG
+  hosts:                             "{{ apic }}"
+  connection:                        local
+  gather_facts:                      no
+
+  tasks:
+    - name:                          Bind to Consumer EPG
+      aci_epg_to_contract:
+          host:                      "{{ apic }}"
+          username:                  "{{ apic_username }}"
+          password:                  "{{ apic_password }}"
+          validate_certs:            no
+          use_proxy:                 no
+          tenant:                    "{{ cons_tn_name }}"
+          ap:                        "{{ cons_ap_name }}"
+          epg:                       "{{ cons_epg_name }}"
+          contract:                  "{{ cont_name }}"
+          contract_type:             consumer
+          state:                     present
+      register:                      cons_epg_contract
