@@ -1,0 +1,2248 @@
+{
+	"info": {
+		"_postman_id": "9a45dccd-b725-4502-8f5e-5256f84771a3",
+		"name": "CiscoLive2019",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Default requests",
+			"item": [
+				{
+					"name": "default post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runner_Build_It_All",
+			"item": [
+				{
+					"name": "APIC Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create VLAN Pools",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fvnsVlanInstP\": {\n    \"attributes\": {\n      \"allocMode\": \"{{allocMode}}\",\n      \"annotation\": \"\",\n      \"descr\": \"{{descr}}\",\n      \"dn\": \"uni/infra/vlanns-[{{vlanName}}]-static\",\n      \"name\": \"{{vlanName}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"fvnsEncapBlk\": {\n          \"attributes\": {\n            \"allocMode\": \"{{allocMode}}\",\n            \"annotation\": \"\",\n            \"descr\": \"\",\n            \"from\": \"{{from}}\",\n            \"name\": \"\",\n            \"nameAlias\": \"\",\n            \"role\": \"external\",\n            \"to\": \"{{to}}\"\n          }\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create CDP Policy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cdpIfPol\": {\n    \"attributes\": {\n      \"adminSt\": \"{{adminSt}}\",\n      \"annotation\": \"\",\n      \"descr\": \"{{descr}}\",\n      \"dn\": \"uni/infra/cdpIfP-{{cdpPolicyName}}\",\n      \"name\": \"{{cdpPolicyName}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"created,modified\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create PhysDom",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"physDomP\": {\n    \"attributes\": {\n      \"annotation\": \"\",\n      \"dn\": \"uni/phys-{{physDomName}}\",\n      \"name\": \"{{physDomName}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"infraRsVlanNs\": {\n          \"attributes\": {\n            \"annotation\": \"\",\n            \"tDn\": \"uni/infra/vlanns-[{{vlanName}}]-static\"\n          }\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create AAEP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraInfra\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"infraAttEntityP\": {\n          \"attributes\": {\n            \"dn\": \"uni/infra/attentp-all_vlans\",\n            \"name\": \"{{aaepName}}\",\n            \"descr\": \"{{descr}}\",\n            \"rn\": \"attentp-{{aaepName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": [\n            {\n              \"infraProvAcc\": {\n                \"attributes\": {\n                  \"dn\": \"uni/infra/attentp-{{aaepName}}/provacc\",\n                  \"status\": \"created,modified\"\n                },\n                \"children\": []\n              }\n            },\n            {\n              \"infraRsDomP\": {\n                \"attributes\": {\n                  \"tDn\": \"uni/phys-{{physDomName}}\",\n                  \"status\": \"created,modified\"\n                },\n                \"children\": []\n              }\n            }\n          ]\n        }\n      },\n      {\n        \"infraFuncP\": {\n          \"attributes\": {\n            \"dn\": \"uni/infra/funcprof\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create ESX_Hosts Interface Policy Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortGrp\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/funcprof/accportgrp-{{ifPolicyGroupESXName}}\",\n      \"name\": \"{{ifPolicyGroupESXName}}\",\n      \"descr\": \"{{descr}}\",\n      \"rn\": \"accportgrp-{{ifPolicyGroupESXName}}\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"infraRsAttEntP\": {\n          \"attributes\": {\n            \"tDn\": \"uni/infra/attentp-{{aaepName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      },\n      {\n        \"infraRsCdpIfPol\": {\n          \"attributes\": {\n            \"tnCdpIfPolName\": \"{{cdpPolicyName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Linux_Hosts Interface Policy Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortGrp\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/funcprof/accportgrp-{{ifPolicyGroupLinuxName}}\",\n      \"name\": \"{{ifPolicyGroupLinuxName}}\",\n      \"descr\": \"{{descr}}\",\n      \"rn\": \"accportgrp-{{ifPolicyGroupLinuxName}}\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"infraRsAttEntP\": {\n          \"attributes\": {\n            \"tDn\": \"uni/infra/attentp-{{aaepName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      },\n      {\n        \"infraRsCdpIfPol\": {\n          \"attributes\": {\n            \"tnCdpIfPolName\": \"{{cdpPolicyName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Windows_Hosts Interface Policy Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortGrp\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/funcprof/accportgrp-{{ifPolicyGroupWindowsName}}\",\n      \"name\": \"{{ifPolicyGroupWindowsName}}\",\n      \"descr\": \"{{descr}}\",\n      \"rn\": \"accportgrp-{{ifPolicyGroupWindowsName}}\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"infraRsAttEntP\": {\n          \"attributes\": {\n            \"tDn\": \"uni/infra/attentp-{{aaepName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      },\n      {\n        \"infraRsCdpIfPol\": {\n          \"attributes\": {\n            \"tnCdpIfPolName\": \"{{cdpPolicyName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runner_Build_Leaf_Profiles",
+			"item": [
+				{
+					"name": "APIC Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Interface Policy Leaf Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortP\": {\n    \"attributes\": {\n      \"annotation\": \"\",\n      \"descr\": \"{{descr}}\",\n      \"dn\": \"uni/infra/accportprof-{{ifPolicyLeafProfileName}}\",\n      \"name\": \"{{ifPolicyLeafProfileName}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"{{status_is}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runner_Build_Switch_Profiles",
+			"item": [
+				{
+					"name": "APIC Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Switch Policy Leaf Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraNodeP\": {\n    \"attributes\": {\n      \"annotation\": \"\",\n      \"descr\": \"{{descr}}\",\n      \"dn\": \"uni/infra/nprof-{{swPolicyLeafProfileName}}\",\n      \"name\": \"{{swPolicyLeafProfileName}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"{{status_is}}\"\n    },\n    \"children\": [\n      {\n        \"infraRsAccPortP\": {\n          \"attributes\": {\n            \"annotation\": \"\",\n            \"tDn\": \"uni/infra/accportprof-{{swPolicyLeafProfileName}}\"\n          }\n        }\n      },\n      {\n        \"infraLeafS\": {\n          \"attributes\": {\n            \"annotation\": \"\",\n            \"descr\": \"{{descr}}\",\n            \"name\": \"{{leafName}}\",\n            \"nameAlias\": \"\",\n            \"ownerKey\": \"\",\n            \"ownerTag\": \"\",\n            \"type\": \"range\"\n          },\n          \"children\": [\n            {\n              \"infraNodeBlk\": {\n                \"attributes\": {\n                  \"annotation\": \"\",\n                  \"descr\": \"{{descr}}\",\n                  \"from_\": \"{{leafId}}\",\n                  \"name\": \"ae13e494071b4fda\",\n                  \"nameAlias\": \"\",\n                  \"to_\": \"{{leafId}}\"\n                }\n              }\n            }\n          ]\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runner_Build_It_All_Cleanup",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Switch Policy Leaf Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraNodeP\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/nprof-Leafs_101_and_102\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Interface Policy Leaf Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortP\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/accportprof-Leafs_101_and_102\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Windows_Hosts Interface Policy Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortGrp\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/funcprof/accportgrp-Windows_Hosts\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Linux_Hosts Interface Policy Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortGrp\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/funcprof/accportgrp-Linux_Hosts\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete ESX_Hosts Interface Policy Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortGrp\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/funcprof/accportgrp-ESX_Hosts\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete AAEP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAttEntityP\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/attentp-all_vlans\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete PhysDom",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/node/mo/uni/phys-physical_servers.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"node",
+								"mo",
+								"uni",
+								"phys-physical_servers.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete CDP Policy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cdpIfPol\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/cdpIfP-cdp-enabled\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete VLAN Pools",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fvnsVlanInstP\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/vlanns-[all_vlans]-static\",\n      \"status\": \"deleted\"\n    },\n    \"children\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Contract demo",
+			"item": [
+				{
+					"name": "1. Get EPG for a given Endpoint",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/aaaLogin.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"aaaLogin.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get fvCEp by ip address",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvCEp.json?query-target-filter=and(eq(fvCEp.ip,\"{{endpoint-ip-address}}\"))&rsp-subtree=children&rsp-subtree-class=fvRsToVm&rsp-subtree-class=fvRsVm&rsp-subtree-class=fvRsHyper&rsp-subtree-class=fvRsCEpToPathEp&rsp-subtree-class=fvIp&rsp-subtree-class=fvPrimaryEncap&order-by=fvCEp.ip",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvCEp.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "and(eq(fvCEp.ip,\"{{endpoint-ip-address}}\"))"
+										},
+										{
+											"key": "rsp-subtree",
+											"value": "children"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsToVm"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsVm"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsHyper"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsCEpToPathEp"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvIp"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvPrimaryEncap"
+										},
+										{
+											"key": "order-by",
+											"value": "fvCEp.ip"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get fvCEp by ip address range",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvCEp.json?query-target-filter=and(ge(fvCEp.ip,\"{{endpoint-ip-address-start}}\")le(fvCEp.ip,\"{{endpoint-ip-address-end}}\"))&rsp-subtree=children&rsp-subtree-class=fvRsToVm&rsp-subtree-class=fvRsVm&rsp-subtree-class=fvRsHyper&rsp-subtree-class=fvRsCEpToPathEp&rsp-subtree-class=fvIp&rsp-subtree-class=fvPrimaryEncap&order-by=fvCEp.ip",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvCEp.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "and(ge(fvCEp.ip,\"{{endpoint-ip-address-start}}\")le(fvCEp.ip,\"{{endpoint-ip-address-end}}\"))"
+										},
+										{
+											"key": "rsp-subtree",
+											"value": "children"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsToVm"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsVm"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsHyper"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsCEpToPathEp"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvIp"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvPrimaryEncap"
+										},
+										{
+											"key": "order-by",
+											"value": "fvCEp.ip"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get fvIP by EPG",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvIp.json?query-target-filter=and(wcard(fvIp.dn,\"ap-CloudCenter/epg-CCC\"))&order-by=fvIp.addr",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvIp.json"
+									],
+									"query": [
+										{
+											"key": "rsp-subtree",
+											"value": "children",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvIp.dn,\"ap-CloudCenter/epg-CCC\"))"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvIp.dn,\"CCC\"))",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsToVm",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsVm",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsHyper",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsCEpToPathEp",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvIp",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvPrimaryEncap",
+											"disabled": true
+										},
+										{
+											"key": "order-by",
+											"value": "fvIp.addr"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get fvIP by IP",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvIp.json?query-target-filter=and(wcard(fvIp.addr,\"{{endpoint-ip-address}}\"))&order-by=fvIp.addr",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvIp.json"
+									],
+									"query": [
+										{
+											"key": "rsp-subtree",
+											"value": "children",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvIp.addr,\"{{endpoint-ip-address}}\"))"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvIp.dn,\"CCC\"))",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsToVm",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsVm",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsHyper",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsCEpToPathEp",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvIp",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvPrimaryEncap",
+											"disabled": true
+										},
+										{
+											"key": "order-by",
+											"value": "fvIp.addr"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get fvIP by IP range",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvIp.json?query-target-filter=and(ge(fvIp.addr,\"{{endpoint-ip-address-start}}\"),le(fvIp.addr,\"{{endpoint-ip-address-end}}\"))&order-by=fvIp.addr",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvIp.json"
+									],
+									"query": [
+										{
+											"key": "rsp-subtree",
+											"value": "children",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(ge(fvIp.addr,\"{{endpoint-ip-address-start}}\")le(fvIp.addr,\"{{endpoint-ip-address-end}}\"))",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvIp.dn,\"CCC\"))",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsToVm",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsVm",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsHyper",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsCEpToPathEp",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvIp",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvPrimaryEncap",
+											"disabled": true
+										},
+										{
+											"key": "order-by",
+											"value": "fvIp.addr",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(ge(fvIp.addr,\"{{endpoint-ip-address-start}}\"),le(fvIp.addr,\"{{endpoint-ip-address-end}}\"))&order-by=fvIp.addr"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "2. Get provided and consumed contracts for a given EPG",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/aaaLogin.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"aaaLogin.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Provided Contract for EPG",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvRsProv.json?query-target-filter=and(wcard(fvRsProv.dn,\"tn-{{tn-name}}/ap-{{ap-name}}/epg-{{epg-name}}\"))",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvRsProv.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvRsProv.dn,\"tn-{{tn-name}}/ap-{{ap-name}}/epg-{{epg-name}}\"))"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Consumed Contract for EPG",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/class/fvRsCons.json?query-target-filter=and(wcard(fvRsCons.dn,\"tn-{{tn-name}}/ap-{{ap-name}}/epg-{{epg-name}}\"))",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"class",
+										"fvRsCons.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "and(wcard(fvRsCons.dn,\"tn-{{tn-name}}/ap-{{ap-name}}/epg-{{epg-name}}\"))",
+											"description": "Tenant"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Provided and Consumed Contracts for EPG",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/ap-{{ap-name}}/epg-{{epg-name}}.json?query-target=subtree&target-subtree-class=fvRsProv&target-subtree-class=fvRsCons",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"ap-{{ap-name}}",
+										"epg-{{epg-name}}.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvRsProv"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvRsCons"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "3. Get Contract details",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/aaaLogin.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"aaaLogin.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get contract details",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/brc-{{contract-name}}.json?query-target=self",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"brc-{{contract-name}}.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "self"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get contract subject and filters",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/brc-{{contract-name}}.json?query-target=subtree&target-subtree-class=vzSubj&target-subtree-class=vzRsSubjFiltAtt",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"brc-{{contract-name}}.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "vzSubj"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "vzRsSubjFiltAtt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get contract subject and filters Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/brc-{{contract-name}}.json?query-target=subtree&target-subtree-class=vzSubj&target-subtree-class=vzRsSubjFiltAtt",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"brc-{{contract-name}}.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "vzSubj"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "vzRsSubjFiltAtt"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "4. Get Filter entries",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/aaaLogin.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"aaaLogin.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Filter entries",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/flt-{{filter-name}}.json?query-target=subtree&target-subtree-class=vzEntry",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"flt-{{filter-name}}.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "vzEntry"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "5. Add Filter and Entry to existing Contract",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/aaaLogin.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"aaaLogin.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Contract without subject",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"vzBrCP\": {\n    \"attributes\": {\n      \"annotation\": \"\",\n      \"descr\": \"\",\n      \"dn\": \"uni/tn-{{tn-name}}/brc-{{contract-name}}\",\n      \"name\": \"new-contract\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"prio\": \"unspecified\",\n      \"scope\": \"context\",\n      \"targetDscp\": \"unspecified\",\n      \"status\": \"created,modified\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/.json?rsp-subtree=modified",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										".json"
+									],
+									"query": [
+										{
+											"key": "rsp-subtree",
+											"value": "modified"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Subject and Filter to existing Contract",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n      \"vzSubj\": {\n        \"attributes\": {\n          \"annotation\": \"\",\n          \"consMatchT\": \"AtleastOne\",\n          \"descr\": \"\",\n          \"dn\": \"uni/tn-{{tn-name}}/brc-{{contract-name}}/subj-{{subject-name}}\",\n          \"name\": \"{{subject-name}}\",\n          \"nameAlias\": \"\",\n          \"prio\": \"unspecified\",\n          \"provMatchT\": \"AtleastOne\",\n          \"revFltPorts\": \"yes\",\n          \"targetDscp\": \"unspecified\",\n          \"status\": \"created,modified\"\n        },\n        \"children\": [\n          {\n            \"vzRsSubjFiltAtt\": {\n              \"attributes\": {\n                \"action\": \"permit\",\n                \"annotation\": \"\",\n                \"directives\": \"\",\n                \"priorityOverride\": \"default\",\n                \"tnVzFilterName\": \"{{filter-name}}\",\n                \"status\": \"created,modified\"\n              }\n            }\n          }\n        ]\n      }\n    }"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/brc-{{contract-name}}/subj-{{subject-name}}.json?rsp-subtree=modified",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"brc-{{contract-name}}",
+										"subj-{{subject-name}}.json"
+									],
+									"query": [
+										{
+											"key": "rsp-subtree",
+											"value": "modified"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Filter and Entry",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"vzFilter\": {\n    \"attributes\": {\n      \"annotation\": \"\",\n      \"descr\": \"\",\n      \"dn\": \"uni/tn-{{tn-name}}/flt-{{filter-name}}\",\n      \"name\": \"{{filter-name}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"vzEntry\": {\n          \"attributes\": {\n            \"annotation\": \"\",\n            \"applyToFrag\": \"no\",\n            \"arpOpc\": \"unspecified\",\n            \"dFromPort\": \"{{dst-from-port}}\",\n            \"dToPort\": \"{{dst-to-port}}\",\n            \"descr\": \"\",\n            \"etherT\": \"ip\",\n            \"icmpv4T\": \"unspecified\",\n            \"icmpv6T\": \"unspecified\",\n            \"matchDscp\": \"unspecified\",\n            \"name\": \"{{filter-name}}\",\n            \"nameAlias\": \"\",\n            \"prot\": \"tcp\",\n            \"sFromPort\": \"{{src-from-port}}\",\n            \"sToPort\": \"{{src-to-port}}\",\n            \"stateful\": \"no\",\n            \"tcpRules\": \"\",\n            \"status\": \"created,modified\"\n          }\n        }\n      }\n    ]\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tn-name}}/flt-{{filter-name}}.json?rsp-subtree=modified",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"flt-{{filter-name}}.json"
+									],
+									"query": [
+										{
+											"key": "rsp-subtree",
+											"value": "modified"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "99. Get EP IP addresses and connection path for a given EPG",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+										"exec": [
+											"var jsonData = JSON.parse(responseBody);",
+											"pm.environment.set(\"TOKEN\", jsonData.imdata[0].aaaLogin.attributes.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{USERNAME}}\",\n      \"pwd\":\"{{PASSWORD}}\"\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "https://{{APIC}}/api/aaaLogin.json",
+									"protocol": "https",
+									"host": [
+										"{{APIC}}"
+									],
+									"path": [
+										"api",
+										"aaaLogin.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get fvCEp in a specific EPG including children",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "https://{{APIC}}/api/node/mo/uni/tn-{{tn-name}}/ap-{{ap-name}}/epg-{{epg-name}}.json?query-target=children&target-subtree-class=fvCEp&rsp-subtree=children&rsp-subtree-class=fvRsToVm&rsp-subtree-class=fvRsVm&rsp-subtree-class=fvRsHyper&rsp-subtree-class=fvRsCEpToPathEp&rsp-subtree-class=fvIp&rsp-subtree-class=fvPrimaryEncap&order-by=fvCEp.ip",
+									"protocol": "https",
+									"host": [
+										"{{APIC}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tn-name}}",
+										"ap-{{ap-name}}",
+										"epg-{{epg-name}}.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "children"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvCEp"
+										},
+										{
+											"key": "rsp-subtree",
+											"value": "children"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsToVm"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsVm"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsHyper"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsCEpToPathEp"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvIp"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvPrimaryEncap"
+										},
+										{
+											"key": "order-by",
+											"value": "fvCEp.ip"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Runner Create Multiple BDs",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create BD",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"totalCount\": \"1\",\n  \"imdata\": [\n    {\n      \"fvBD\": {\n        \"attributes\": {\n          \"OptimizeWanBandwidth\": \"no\",\n          \"annotation\": \"\",\n          \"arpFlood\": \"no\",\n          \"descr\": \"\",\n          \"dn\": \"uni/tn-{{tn_name}}/BD-{{fvBD_name}}\",\n          \"epClear\": \"no\",\n          \"epMoveDetectMode\": \"\",\n          \"intersiteBumTrafficAllow\": \"no\",\n          \"intersiteL2Stretch\": \"no\",\n          \"ipLearning\": \"yes\",\n          \"limitIpLearnToSubnets\": \"yes\",\n          \"llAddr\": \"::\",\n          \"mac\": \"00:22:BD:F8:19:FF\",\n          \"mcastAllow\": \"no\",\n          \"multiDstPktAct\": \"bd-flood\",\n          \"name\": \"{{fvBD_name}}\",\n          \"nameAlias\": \"\",\n          \"ownerKey\": \"\",\n          \"ownerTag\": \"\",\n          \"type\": \"regular\",\n          \"unicastRoute\": \"yes\",\n          \"unkMacUcastAct\": \"proxy\",\n          \"unkMcastAct\": \"flood\",\n          \"status\": \"{{status_is}}\",\n          \"vmac\": \"not-applicable\"\n        },\n        \"children\": [\n          {\n            \"fvSubnet\": {\n              \"attributes\": {\n                \"annotation\": \"\",\n                \"ctrl\": \"\",\n                \"descr\": \"\",\n                \"ip\": \"{{ip_gateway}}\",\n                \"name\": \"\",\n                \"nameAlias\": \"\",\n                \"preferred\": \"no\",\n                \"scope\": \"{{scope}}\",\n                \"virtual\": \"no\"\n              },\n              \"children\": [\n                {\n                  \"fvRsBDSubnetToProfile\": {\n                    \"attributes\": {\n                      \"annotation\": \"\",\n                      \"tnL3extOutName\": \"{{tnL3extOut_name}}\",\n                      \"tnRtctrlProfileName\": \"\"\n                    }\n                  }\n                }\n              ]\n            }\n          },\n          {\n            \"fvRsIgmpsn\": {\n              \"attributes\": {\n                \"annotation\": \"\",\n                \"tnIgmpSnoopPolName\": \"\"\n              }\n            }\n          },\n          {\n            \"fvRsCtx\": {\n              \"attributes\": {\n                \"annotation\": \"\",\n                \"tnFvCtxName\": \"{{tnFvCtx_name}}\"\n              }\n            }\n          },\n          {\n            \"fvRsBdToEpRet\": {\n              \"attributes\": {\n                \"annotation\": \"\",\n                \"resolveAct\": \"resolve\",\n                \"tnFvEpRetPolName\": \"\"\n              }\n            }\n          },\n          {\n            \"fvRsBDToNdP\": {\n              \"attributes\": {\n                \"annotation\": \"\",\n                \"tnNdIfPolName\": \"\"\n              }\n            }\n          }\n        ]\n      }\n    }\n  ]\n}\n"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runner Create new app",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create AP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"totalCount\": \"1\",\n    \"imdata\": [\n        {\n            \"fvAp\": {\n                \"attributes\": {\n                    \"annotation\": \"\",\n                    \"descr\": \"\",\n                    \"dn\": \"uni/tn-{{tn_name}}/ap-{{ap_name}}\",\n                    \"name\": \"{{ap_name}}\",\n                    \"nameAlias\": \"\",\n                    \"ownerKey\": \"\",\n                    \"ownerTag\": \"\",\n                    \"prio\": \"unspecified\",\n                    \"status\": \"{{status_is}}\"\n                },\n                \"children\": [\n                    {\n                        \"fvAEPg\": {\n                            \"attributes\": {\n                                \"annotation\": \"\",\n                                \"descr\": \"\",\n                                \"exceptionTag\": \"\",\n                                \"floodOnEncap\": \"disabled\",\n                                \"fwdCtrl\": \"\",\n                                \"hasMcastSource\": \"no\",\n                                \"isAttrBasedEPg\": \"no\",\n                                \"matchT\": \"AtleastOne\",\n                                \"name\": \"{{epg_name}}\",\n                                \"nameAlias\": \"\",\n                                \"pcEnfPref\": \"unenforced\",\n                                \"prefGrMemb\": \"exclude\",\n                                \"prio\": \"unspecified\",\n                                \"shutdown\": \"no\"\n                            },\n                            \"children\": [\n                                {\n                                    \"fvRsDomAtt\": {\n                                        \"attributes\": {\n                                            \"annotation\": \"\",\n                                            \"bindingType\": \"none\",\n                                            \"classPref\": \"encap\",\n                                            \"delimiter\": \"\",\n                                            \"encap\": \"unknown\",\n                                            \"encapMode\": \"auto\",\n                                            \"epgCos\": \"Cos0\",\n                                            \"epgCosPref\": \"disabled\",\n                                            \"instrImedcy\": \"lazy\",\n                                            \"lagPolicyName\": \"\",\n                                            \"netflowDir\": \"both\",\n                                            \"netflowPref\": \"disabled\",\n                                            \"numPorts\": \"0\",\n                                            \"portAllocation\": \"none\",\n                                            \"primaryEncap\": \"unknown\",\n                                            \"primaryEncapInner\": \"unknown\",\n                                            \"resImedcy\": \"lazy\",\n                                            \"secondaryEncapInner\": \"unknown\",\n                                            \"switchingMode\": \"native\",\n                                            \"tDn\": \"uni/vmmp-VMware/dom-Ciscolive-vds-01\"\n                                        }\n                                    }\n                                },\n                                {\n                                    \"fvRsCustQosPol\": {\n                                        \"attributes\": {\n                                            \"annotation\": \"\",\n                                            \"tnQosCustomPolName\": \"\"\n                                        }\n                                    }\n                                },\n                                {\n                                    \"fvRsBd\": {\n                                        \"attributes\": {\n                                            \"annotation\": \"\",\n                                            \"tnFvBDName\": \"{{fvBD_name}}\"\n                                        }\n                                    }\n                                }\n                            ]\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Scratch",
+			"item": [
+				{
+					"name": "Create Interface Policy Leaf Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraAccPortP\": {\n    \"attributes\": {\n      \"annotation\": \"\",\n      \"descr\": \"{{descr}}\",\n      \"dn\": \"uni/infra/accportprof-{{ifPolicyLeafProfileName}}\",\n      \"name\": \"{{ifPolicyLeafProfileName}}\",\n      \"nameAlias\": \"\",\n      \"ownerKey\": \"\",\n      \"ownerTag\": \"\",\n      \"status\": \"created,modified\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Switch Policy Leaf Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"value": "APIC-cookie={{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"infraNodeP\": {\n    \"attributes\": {\n      \"dn\": \"uni/infra/nprof-{{swPolicyLeafProfileName}}\",\n      \"name\": \"{{swPolicyLeafProfileName}}\",\n      \"descr\": \"{{descr}}\",\n      \"rn\": \"nprof-{{swPolicyLeafProfileName}}\",\n      \"status\": \"created,modified\"\n    },\n    \"children\": [\n      {\n        \"infraLeafS\": {\n          \"attributes\": {\n            \"dn\": \"uni/infra/nprof-{{swPolicyLeafProfileName}}/leaves-{{leaf101Name}}-typ-range\",\n            \"type\": \"range\",\n            \"name\": \"{{leaf101Name}}\",\n            \"rn\": \"leaves-{{leaf101Name}}-typ-range\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": [\n            {\n              \"infraNodeBlk\": {\n                \"attributes\": {\n                  \"dn\": \"uni/infra/nprof-{{swPolicyLeafProfileName}}/leaves-{{leaf101Name}}-typ-range/nodeblk-ae13e494071b4fda\",\n                  \"from_\": \"{{leaf101Id}}\",\n                  \"to_\": \"{{leaf101Id}}\",\n                  \"name\": \"ae13e494071b4fda\",\n                  \"rn\": \"nodeblk-ae13e494071b4fda\",\n                  \"status\": \"created,modified\"\n                },\n                \"children\": []\n              }\n            }\n          ]\n        }\n      },\n      {\n        \"infraLeafS\": {\n          \"attributes\": {\n            \"dn\": \"uni/infra/nprof-{{swPolicyLeafProfileName}}/leaves-{{leaf102Name}}-typ-range\",\n            \"type\": \"range\",\n            \"name\": \"{{leaf102Name}}\",\n            \"rn\": \"leaves-{{leaf102Name}}-typ-range\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": [\n            {\n              \"infraNodeBlk\": {\n                \"attributes\": {\n                  \"dn\": \"uni/infra/nprof-{{swPolicyLeafProfileName}}/leaves-{{leaf102Name}}-typ-range/nodeblk-3beb6e082d2248e2\",\n                  \"from_\": \"{{leaf102Id}}\",\n                  \"to_\": \"{{leaf102Id}}\",\n                  \"name\": \"3beb6e082d2248e2\",\n                  \"rn\": \"nodeblk-3beb6e082d2248e2\",\n                  \"status\": \"created,modified\"\n                },\n                \"children\": []\n              }\n            }\n          ]\n        }\n      },\n      {\n        \"infraRsAccPortP\": {\n          \"attributes\": {\n            \"tDn\": \"uni/infra/accportprof-{{swPolicyLeafProfileName}}\",\n            \"status\": \"created,modified\"\n          },\n          \"children\": []\n        }\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/mo/.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"mo",
+								".json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Target queries",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "420ac02a-3448-4d74-b8d8-f7d0259e95c8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", jsonData.imdata[0].aaaLogin.attributes.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aaaUser\":{\n    \"attributes\":{\n      \"name\":\"{{username}}\",\n      \"pwd\":\"{{password}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/aaaLogin.json",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"aaaLogin.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Class",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/node/class/fvBD.json?",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"node",
+								"class",
+								"fvBD.json"
+							],
+							"query": [
+								{
+									"key": "query-target",
+									"value": null,
+									"description": "{{ self | children | subtree }}",
+									"disabled": true
+								},
+								{
+									"key": "target-subtree-class",
+									"value": null,
+									"description": "{{ class-name }}",
+									"disabled": true
+								},
+								{
+									"key": "query-target-filter",
+									"value": null,
+									"description": "{{ filter-expression }} e.g  and(wcard(class.attribute,\"object\"))",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree",
+									"value": "",
+									"description": "{{ no | children | full }}",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree-class",
+									"value": null,
+									"description": "{{ class-name }}",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree-filter",
+									"value": null,
+									"description": "{{ filter-expression }}",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree-include",
+									"value": null,
+									"description": "{{ faults | health | etc }}",
+									"disabled": true
+								},
+								{
+									"key": "order-by",
+									"value": null,
+									"description": "classname.property {{ asc | desc }}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dn",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apic}}/api/node/mo/uni/tn-common.json?",
+							"protocol": "https",
+							"host": [
+								"{{apic}}"
+							],
+							"path": [
+								"api",
+								"node",
+								"mo",
+								"uni",
+								"tn-common.json"
+							],
+							"query": [
+								{
+									"key": "query-target",
+									"value": "subtree",
+									"description": "{{ self | children | subtree }}",
+									"disabled": true
+								},
+								{
+									"key": "target-subtree-class",
+									"value": "fvAp",
+									"description": "{{ class-name }}",
+									"disabled": true
+								},
+								{
+									"key": "query-target-filter",
+									"value": null,
+									"description": "{{ filter-expression }} e.g  and(wcard(class.attribute,\"object\"))",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree",
+									"value": "full",
+									"description": "{{ no | children | full }}",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree-class",
+									"value": null,
+									"description": "{{ class-name }}",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree-filter",
+									"value": null,
+									"description": "{{ filter-expression }}",
+									"disabled": true
+								},
+								{
+									"key": "rsp-subtree-include",
+									"value": null,
+									"description": "{{ faults | health | etc }}",
+									"disabled": true
+								},
+								{
+									"key": "order-by",
+									"value": null,
+									"description": "classname.property {{ asc | desc }}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
